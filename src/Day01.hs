@@ -6,11 +6,7 @@ import RIO
 import RIO.List (iterate)
 import qualified RIO.Text as T
 
-asFloat :: Integer -> Double
-asFloat = fromIntegral
-
-readInt :: Text -> Maybe Integer
-readInt = T.unpack >>> readMaybe
+import Util (asFloat, readInt)
 
 calc :: Integer -> Integer
 calc = asFloat >>> (/3) >>> floor >>> (subtract 2)
@@ -20,8 +16,8 @@ calcWithFuel = sum . drop 1 . takeWhile (>0) . iterate calc
 
 getInput :: IO [Integer]
 getInput = do
-  input <- readFileUtf8 "data/1"
-  return  .fold $ traverse readInt (T.lines input)
+  input <- T.lines <$> readFileUtf8 "data/1"
+  return . fold $ traverse readInt input
 
 part1 :: IO Integer
 part1 = do

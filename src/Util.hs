@@ -20,3 +20,6 @@ chunk n xs =
    in if null b
         then [a]
         else a : chunk n b
+
+distance :: Num a => (a, a) -> (a, a) -> a
+distance (x1, y1) (x2, y2) = abs (x2 - x1) + abs (y2 - y1)

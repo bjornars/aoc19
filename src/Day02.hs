@@ -47,7 +47,6 @@ run arr pc = do
     99 -> do
       return ()
     _ -> do
-      traceM "unknown instruction"
       return ()
 
 exec :: [Integer] -> (forall s. STArray s Integer Integer -> ST s ()) -> [Integer]

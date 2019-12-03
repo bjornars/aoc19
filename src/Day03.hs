@@ -1,13 +1,15 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module Day03 where
 
 import Data.Maybe (fromJust)
+import Data.Tuple (swap)
 import Parser
 import RIO
 import RIO.List.Partial (foldl1, last, minimum)
-import qualified RIO.Set as S
+import qualified RIO.Map as M
 import qualified RIO.State as ST
 import Util (distance)
 
@@ -19,7 +21,7 @@ type Wire = [Turn]
 
 type Point = (Int, Int)
 
-type WireMap = Set Point
+type WireMap = M.Map Point Int
 
 parseDir :: ReadP Dir
 parseDir = char 'L' $> L <|> char 'R' $> R <|> char 'U' $> U <|> char 'D' $> D
@@ -39,34 +41,46 @@ parseInput = parse (parseWires <* eof)
 getInput :: IO [Wire]
 getInput = readFileUtf8 "data/3" <&> (parseInput >>> fromJust)
 
-getNext :: Point -> Turn -> [Point]
-getNext _ (Turn _ 0) = error "cannot deal with empty turns"
-getNext coords (Turn L num) = flip (first . flip (-)) coords <$> [1 .. num]
-getNext coords (Turn D num) = flip (second . flip (-)) coords <$> [1 .. num]
-getNext coords (Turn R num) = flip (first . (+)) coords <$> [1 .. num]
-getNext coords (Turn U num) = flip (second . (+)) coords <$> [1 .. num]
+getNext :: Int -> Point -> Turn -> [(Int, Point)]
+getNext dist (startX, startY) = \case
+  Turn _ 0 -> error "cannot deal with empty turns"
+  Turn L num -> opX (-) <$> [1 .. num]
+  Turn D num -> opY (-) <$> [1 .. num]
+  Turn R num -> opX (+) <$> [1 .. num]
+  Turn U num -> opY (+) <$> [1 .. num]
+  where
+    opX op p = (dist + p, (startX `op` p, startY))
+    opY op p = (dist + p, (startX, startY `op` p))
 
 makeWireMap :: Wire -> WireMap
-makeWireMap = snd . flip ST.execState ((0, 0), S.empty) . traverse step
+makeWireMap = third . flip ST.execState (0, (0, 0), M.empty) . traverse step
   where
-    step :: Turn -> ST.State (Point, WireMap) ()
+    third (_, _, a) = a
+    step :: Turn -> ST.State (Int, Point, WireMap) ()
     step turn = do
-      (current, grid) <- ST.get
-      let next = getNext current turn
-      ST.put (last next, foldr S.insert grid next)
+      (dist, current, grid) <- ST.get
+      let next = getNext dist current turn
+      let end = last next
+      let nextGrid = grid `M.union` M.fromList (swap <$> next)
+      ST.put (fst end, snd end, nextGrid)
 
-getIntersections :: [Wire] -> [Point]
-getIntersections = fmap makeWireMap >>> foldl1 S.intersection >>> toList
+getIntersections :: [Wire] -> [(Point, [Int])]
+getIntersections = fmap (makeWireMap >>> fmap (:[])) >>> foldl1 (M.intersectionWith (<>)) >>> M.toList
 
-getClosestDistance :: [Point] -> Int
-getClosestDistance = fmap (distance (0, 0)) >>> minimum
+getClosestDistance :: [(Point, [Int])] -> Int
+getClosestDistance = fmap (fst >>> distance (0, 0)) >>> minimum
+
+getClosestLength :: [(Point, [Int])] -> Int
+getClosestLength = fmap (snd >>> sum) >>> minimum
 
 calc :: [Wire] -> Int
 calc = getClosestDistance . getIntersections
+
+calcLength :: [Wire] -> Int
+calcLength = getClosestLength . getIntersections
 
 part1 :: IO Int
 part1 = calc <$> getInput
 
 part2 :: IO Int
-part2 = do
-  return 0
+part2 = calcLength <$> getInput

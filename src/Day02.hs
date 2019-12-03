@@ -1,6 +1,6 @@
-{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module Day02 where
@@ -10,7 +10,6 @@ import Data.Maybe
 import RIO
 import RIO.List.Partial ((!!))
 import qualified RIO.Text as T
-
 import Util (readInt)
 
 data Op
@@ -51,17 +50,18 @@ run arr pc = do
 
 exec :: [Integer] -> (forall s. STArray s Integer Integer -> ST s ()) -> [Integer]
 exec program setup =
-  toList $
-  runSTArray $ do
-    arr <- newListArray (0, fromIntegral $ length program - 1) program
-    setup arr
-    run arr 0
-    return arr
+  toList
+    $ runSTArray
+    $ do
+      arr <- newListArray (0, fromIntegral $ length program - 1) program
+      setup arr
+      run arr 0
+      return arr
 
 execWith :: [Integer] -> Integer -> Integer -> [Integer]
 execWith input a b = exec input $ \arr -> do
-    writeArray arr 1 a
-    writeArray arr 2 b
+  writeArray arr 1 a
+  writeArray arr 2 b
 
 part1 :: IO Integer
 part1 = do
@@ -76,6 +76,6 @@ part2 = do
   return $ x * 100 + y
   where
     res input = do
-      x <- [0..100]
-      y <- [0..100]
+      x <- [0 .. 100]
+      y <- [0 .. 100]
       return $ (execWith input x y !! 0, (x, y))

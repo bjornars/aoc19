@@ -1,16 +1,16 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module Parser
-  ( module Text.ParserCombinators.ReadP
-  , module Parser
-  ) where
-
-import RIO
-import qualified RIO.Text as T
+  ( module Text.ParserCombinators.ReadP,
+    module Parser,
+  )
+where
 
 import Data.Char (isDigit)
 import Data.Maybe (fromJust)
+import RIO
+import qualified RIO.Text as T
 import Text.ParserCombinators.ReadP
 
 nonNegDigit :: ReadP Int

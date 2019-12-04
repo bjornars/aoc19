@@ -26,17 +26,12 @@ hasATwoRun = group >>> any (length >>> (== 2))
 
 calc :: ([Int] -> Bool) -> (Int, Int) -> [Int]
 calc pred (lowerBound, upperBound) = do
-  d1 <- [0 .. 9]
-  d2 <- [0 .. 9]
-  guard $ d2 >= d1
-  d3 <- [0 .. 9]
-  guard $ d3 >= d2
-  d4 <- [0 .. 9]
-  guard $ d4 >= d3
-  d5 <- [0 .. 9]
-  guard $ d5 >= d4
-  d6 <- [0 .. 9]
-  guard $ d6 >= d5
+  d1 <- [0 .. 6]
+  d2 <- [d1 .. 9]
+  d3 <- [d2 .. 9]
+  d4 <- [d3 .. 9]
+  d5 <- [d4 .. 9]
+  d6 <- [d5 .. 9]
   let digits = [d1, d2, d3, d4, d5, d6]
   let res = toDigit digits
   guard $ res >= lowerBound && res <= upperBound

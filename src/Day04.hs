@@ -7,10 +7,7 @@ import RIO
 import RIO.List (group)
 
 toDigit :: [Int] -> Int
-toDigit = go . reverse
-  where
-    go (x : xs) = x + 10 * go xs
-    go [] = 0
+toDigit = foldl' ((10 *) >>> (+)) 0
 
 parseBounds :: String -> Maybe (Int, Int)
 parseBounds (x1 : x2 : x3 : x4 : x5 : x6 : '-' : y1 : y2 : y3 : y4 : y5 : y6 : []) =

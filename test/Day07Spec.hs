@@ -19,8 +19,8 @@ spec = do
 
     it "part1" $ do
       res <- part1
-      res `shouldBe` 9219874
+      res `shouldBe` 45730
 
     it "part2" $ do
       res <- part2
-      res `shouldBe` 5893654
+      res `shouldBe` 5406484

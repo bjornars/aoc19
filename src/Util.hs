@@ -4,6 +4,7 @@ module Util where
 
 import RIO
 import qualified RIO.Text as T
+import Data.Semigroup
 
 asFloat :: Integer -> Double
 asFloat = fromIntegral
@@ -23,3 +24,6 @@ chunk n xs =
 
 distance :: Num a => (a, a) -> (a, a) -> a
 distance (x1, y1) (x2, y2) = abs (x2 - x1) + abs (y2 - y1)
+
+minmax :: (Bounded a, Ord a, Foldable f) => f a -> (a, a)
+minmax = (getMin *** getMax) . foldMap (Min &&& Max)
